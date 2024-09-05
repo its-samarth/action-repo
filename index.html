@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Events</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .event {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Latest GitHub Events</h1>
+    <div id="events"></div>
+
+    <script>
+        async function fetchEvents() {
+            const response = await fetch('/events');
+            const data = await response.json();
+            const eventsDiv = document.getElementById('events');
+            eventsDiv.innerHTML = ''; // Clear existing events
+
+            data.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'event';
+
+                let text = '';
+                if (event.action === 'push') {
+                    text = `${event.author} pushed to ${event.branch} on ${event.timestamp}`;
+                } else if (event.action === 'pull_request') {
+                    text = `${event.author} submitted a pull request from ${event.source_branch} to ${event.target_branch} on ${event.timestamp}`;
+                } else if (event.action === 'merge') {
+                    text = `${event.author} merged branch ${event.source_branch} to ${event.target_branch} on ${event.timestamp}`;
+                }
+
+                eventElement.textContent = text;
+                eventsDiv.appendChild(eventElement);
+            });
+        }
+
+        setInterval(fetchEvents, 15000); // Fetch events every 15 seconds
+        fetchEvents(); // Initial fetch
+    </script>
+</body>
+</html>
